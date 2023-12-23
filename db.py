@@ -17,6 +17,3 @@ def create_session(inner = False):
     Session = sessionmaker(bind=engine)
     session = Session()
     return session
-def close_session(session):
-    session.commit()
-    session.close()

@@ -1,13 +1,14 @@
-from db import create_session, close_session
-from models import *
+import logic
+from logger_setup import setup_logging
+import logging
+from datetime import datetime
 
-session = create_session()
-result = session.query(WpPost).filter(WpPost.ID==23010).all()
-for r in result:
-    print(r.post_title)
-# result = session.query(Post).filter(Post.kw_post_id == 'hh4h4').all()
-# if len(result):
-#     post = result.pop()
-#     print(post.kw_post_id)
+setup_logging()
+logger = logging.getLogger(__name__)
+logger.info(f"Run started @ {datetime.now().strftime('%y%m%d-%H%M')}")
 
-close_session(session)
+# wordpress_id = logic.create_post(property_id='34', data={'terms': ['Condos','Sales', 'Hi', 'Gym', ' New Jersey State'], 'main': {'post_title': 'YESSSSSS!', 'post_status' : 'publish'}, 'meta': {'property_price': '985214'}})
+# print(wordpress_id)
+
+logic.delete_post(wordpress_id=31001)
+logger.info(f"Run done @ {datetime.now().strftime('%y%m%d-%H%M')}")

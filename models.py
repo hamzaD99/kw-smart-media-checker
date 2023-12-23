@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 metadata = Base.metadata
 
-class Post(Base):
+class InnerPost(Base):
     __tablename__ = 'posts_added'
 
     id = Column(BIGINT(20), Sequence('id_seq'), primary_key=True)
@@ -50,7 +50,25 @@ class WpPost(Base):
     post_type = Column(String(20), nullable=False, server_default=text("'post'"))
     post_mime_type = Column(String(100), nullable=False, server_default=text("''"))
     comment_count = Column(BIGINT(20), nullable=False, server_default=text("0"))
-
+    def __init__(self, post_data):
+        self.post_author = post_data.get('post_author', 1)
+        self.post_content = post_data.get('post_content', 'default post')
+        self.post_title = post_data.get('post_title', 'default post')
+        self.post_excerpt = post_data.get('post_excerpt', '')
+        self.post_status = post_data.get('post_status', 'draft')
+        self.comment_status = post_data.get('comment_status', 'open')
+        self.ping_status = post_data.get('ping_status', 'closed')
+        self.post_password = post_data.get('post_password', '')
+        self.post_name = post_data.get('post_name', 'default-post')
+        self.to_ping = post_data.get('to_ping', '')
+        self.pinged = post_data.get('pinged', '')
+        self.post_content_filtered = post_data.get('post_content_filtered', '')
+        self.post_parent = post_data.get('post_parent', 0)
+        self.guid = post_data.get('guid', 'https://kw.smart-media.agency/')
+        self.menu_order = post_data.get('menu_order', 0)
+        self.post_type = post_data.get('post_type', 'estate_property')
+        self.post_mime_type = post_data.get('post_mime_type', '')
+        self.comment_count = post_data.get('comment_count', 0)
 
 class WpTermRelationship(Base):
     __tablename__ = 'wp_term_relationships'
@@ -58,20 +76,6 @@ class WpTermRelationship(Base):
     object_id = Column(BIGINT(20), primary_key=True, nullable=False, server_default=text("0"))
     term_taxonomy_id = Column(BIGINT(20), primary_key=True, nullable=False, index=True, server_default=text("0"))
     term_order = Column(INTEGER(11), nullable=False, server_default=text("0"))
-
-
-class WpTermTaxonomy(Base):
-    __tablename__ = 'wp_term_taxonomy'
-    __table_args__ = (
-        Index('term_id_taxonomy', 'term_id', 'taxonomy', unique=True),
-    )
-
-    term_taxonomy_id = Column(BIGINT(20), primary_key=True)
-    term_id = Column(BIGINT(20), nullable=False, server_default=text("0"))
-    taxonomy = Column(String(32), nullable=False, index=True, server_default=text("''"))
-    description = Column(LONGTEXT, nullable=False)
-    parent = Column(BIGINT(20), nullable=False, server_default=text("0"))
-    count = Column(BIGINT(20), nullable=False, server_default=text("0"))
 
 
 class WpTerm(Base):
