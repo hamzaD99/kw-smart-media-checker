@@ -446,12 +446,11 @@ default_post_data = {
     "comment_status": "open",
     "ping_status": "closed",
     "post_password": "",
-    "post_name": "default-post",
     "to_ping": "",
     "pinged": "",
     "post_content_filtered": "",
     "post_parent": 0,
-    "guid": "https://kw.smart-media.agency/",
+    "guid": "https://kw.smart-media.agency/", # to edit
     "menu_order": 0,
     "post_type": "estate_property",
     "post_mime_type": "",

@@ -20,7 +20,6 @@ def create_wp_post(property_id, wp_session, post_data = {}):
         return False
     return wordpress_id
 
-
 def add_post_meta(wp_session, wordpress_id, property_id, meta_data = {}):
     from constants import default_meta_data
     final_meta_data = {item["meta_key"]: item["meta_value"] for item in default_meta_data}
@@ -38,7 +37,7 @@ def add_post_meta(wp_session, wordpress_id, property_id, meta_data = {}):
 
 def add_term(wp_session, term, taxomony, parent=None):
     try:
-        term_to_add = WpTerm(name=term,slug=quote(term.lower(), safe='/:.-_'),term_group=0)
+        term_to_add = WpTerm(name=term,slug=quote(term.lower().replace(' ','-'), safe='/:.-_'),term_group=0)
         wp_session.add(term_to_add)
         wp_session.commit()
         parentId = 0
@@ -92,7 +91,20 @@ def add_post_term(wp_session, wordpress_id, property_id, terms):
         logger.error(f'Terms not found = {terms_not_found}')
     return True
 
+
+def check_if_exists(property_id):
+    inner_session = create_session(inner=True)
+    result = inner_session.query(InnerPost).filter(InnerPost.kw_post_id == property_id).first()
+    inner_session.close()
+    if result:
+        logger.info(f'Property {property_id} exists with WpPost Id = {result.wp_post_id}')
+        return result.wp_post_id
+    return False
+
 def create_post(property_id, data = {}):
+    isExists = check_if_exists(property_id=property_id)
+    if isExists:
+        return isExists
     main_data = data.get('main', {})
     meta_data = data.get('meta', {})
     terms_data = data.get('terms', [])
@@ -112,15 +124,15 @@ def create_post(property_id, data = {}):
         delete_post(wordpress_id=wordpress_id)
         return False
     wp_session.close()
-    # inner_session = create_session(inner=True)
-    # try:
-    #     post_to_add = InnerPost(kw_post_id=property_id,wp_post_id=wordpress_id)
-    #     inner_session.add(post_to_add)
-    #     inner_session.commit()
-    # except Exception as e:
-    #     logger.error(f'Property {property_id}, WpPost Id {wordpress_id} Error adding post to innerDB: {e}', exc_info=True)
-    #     return False
-    # inner_session.close()
+    inner_session = create_session(inner=True)
+    try:
+        post_to_add = InnerPost(kw_post_id=property_id,wp_post_id=wordpress_id)
+        inner_session.add(post_to_add)
+        inner_session.commit()
+    except Exception as e:
+        logger.error(f'Property {property_id}, WpPost Id {wordpress_id} Error adding post to innerDB: {e}', exc_info=True)
+        return False
+    inner_session.close()
     return wordpress_id
 
 def delete_post(wordpress_id, level = 3):

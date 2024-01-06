@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from models import InnerPost
 import dotenv
 import os
 
@@ -13,7 +14,8 @@ def create_session(inner = False):
     if inner:
         connection_string = 'sqlite:///main.db'
     engine = create_engine(connection_string, echo=True)
-    Base.metadata.create_all(engine)
+    if inner:
+        InnerPost.__table__.create(bind=engine, checkfirst=True)
     Session = sessionmaker(bind=engine)
     session = Session()
     return session

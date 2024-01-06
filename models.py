@@ -10,8 +10,7 @@ metadata = Base.metadata
 class InnerPost(Base):
     __tablename__ = 'posts_added'
 
-    id = Column(BIGINT(20), Sequence('id_seq'), primary_key=True)
-    kw_post_id = Column(String(50), unique=True)
+    kw_post_id = Column(String(50), unique=True, primary_key=True)
     wp_post_id = Column(BIGINT(20), unique=True)
 
 class WpPostmeta(Base):
@@ -63,7 +62,7 @@ class WpPost(Base):
         self.comment_status = post_data.get('comment_status', 'open')
         self.ping_status = post_data.get('ping_status', 'closed')
         self.post_password = post_data.get('post_password', '')
-        self.post_name = post_data.get('post_name', quote(self.post_title.lower(), safe='/:.-_'))
+        self.post_name = post_data.get('post_name', quote(self.post_title.lower().replace(' ','-'), safe='/:.-_'))
         self.to_ping = post_data.get('to_ping', '')
         self.pinged = post_data.get('pinged', '')
         self.post_content_filtered = post_data.get('post_content_filtered', '')
